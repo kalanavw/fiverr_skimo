@@ -77,14 +77,15 @@ public class DemoMediaViewController
 				e.printStackTrace();
 				return "error.html";
 			}
-			String videoFile = new File( videoResource.getURI() ).getName();
+			File videoFile = new File( videoResource.getURI() );
+			String videoFileName = videoFile.getName();
 			System.out.println( baseUrl );
 			ArrayList<DemoMedia> demoMediaList = new ArrayList<>();
 			List<String> finalImgList = imgList;
 			IntStream.range( 0, preparedTimeList.size() ).forEach( i -> {
 				double v = Double.parseDouble( preparedTimeList.get( i ) );
 				int videoTime = ( int ) v;
-				demoMediaList.add( new DemoMedia( this.baseUrl.concat( "img/" ).concat( finalImgList.get( i ) ), this.baseUrl.concat( videoFile ).concat( "#t=" + videoTime ) ) );
+				demoMediaList.add( new DemoMedia( this.baseUrl.concat( "img/" ).concat( finalImgList.get( i ) ), this.baseUrl.concat( videoFileName ).concat( "#t=" + videoTime ) ) );
 			} );
 
 			model.addAttribute( "mediaList", demoMediaList );
