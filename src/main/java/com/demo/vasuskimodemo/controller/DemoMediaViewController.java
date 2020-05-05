@@ -97,4 +97,10 @@ public class DemoMediaViewController
 			return "error.html";
 		}
 	}
+
+	@GetMapping("privacy")
+	public String viewPrivacy( Model model )
+	{
+		return "privacy.html";
+	}
 }
