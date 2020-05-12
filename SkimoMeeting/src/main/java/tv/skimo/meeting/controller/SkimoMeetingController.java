@@ -104,13 +104,15 @@ public class SkimoMeetingController {
 	}
 
 	@PostMapping("/videos/upload")
+	@ResponseBody
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes)
 	{
-		String assetId = null;
+		String assetId = "";
 		storageService.store(file);
 		assetId = AssetUtil.createHash(Constants.UPLOAD_DIR , file.getOriginalFilename());
-		String retVal = "redirect:/" + "skimo/" + assetId;
+//		String retVal = "redirect:/" + "skimo/" + assetId;
+		String retVal = "skimo/" + assetId;
 		return retVal;
 	}
 

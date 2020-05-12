@@ -15,6 +15,7 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
 * {
   box-sizing: border-box;
@@ -77,6 +78,9 @@
   font-size: 18px;
 }
 
+
+
+
     </style>
     <style>
 html,body {
@@ -99,6 +103,8 @@ h3 {
   color: #888;
   font-size: 1.5em;
 }
+
+
 
     </style>
 
@@ -134,22 +140,16 @@ h3 {
             <br/>
             <h3>Generate Skimo</h3>
             <br/>
-
-            <form class="md-form" id="upload_form" method="POST" enctype="multipart/form-data">
-                <div class="file-field">
-                    <div class="btn btn-outline-secondary btn-lg">
-                        <input type="file"  name="file1" id="file1"  accept=".mp4">
-                    </div>
-                    <div class="file-path-wrapper">
-                        <br/>
-                        <input class="file-path validate" id="btnSubmit" type="submit" value="upload" placeholder="Upload video" onchange="uploadFile()">
-                        <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
-                        <h3 id="status"></h3>
-                        <p id="loaded_n_total"></p>
-                    </div>
+            <form class="md-form" method="POST" enctype="multipart/form-data" id="upload_form" onsubmit="uploadFile(); return false;">
+                <div class="btn btn-outline-secondary btn-lg"><input type="file" name="file" id="file"/></div>
+                <div class="file-path-wrapper">
+                    <br/>
+                    <input type="submit" value="Submit">
+                    <progress id="progress-bar" value="0" max="100" style="width:300px;"></progress>
+                    <h3 id="status"></h3>
+                    <p id="loaded_n_total"></p>
                 </div>
             </form>
-
 
             <div th:if="${message}">
                 <h3 th:text="${message}"/></h3>
@@ -206,9 +206,71 @@ h3 {
         </div>
     </div>
 </footer>
+<script type="text/javascript">
+            function uploadFile() {
+//  var file = _("file").files[0];
+var file = document.getElementById('file').files[0];
+  var formData = new FormData();
+  formData.append("file", file);
+  console.log(file);
+
+
+      $.ajax({
+        type: "POST",
+        url: "upload",
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                myXhr.upload.addEventListener('progress', progressHandler, false);
+            }
+            return myXhr;
+        },
+        success: function (data) {
+            // your callback here
+            console.log(data)
+             document.write(data)
+             window.location.href = '../'+data;
+        },
+        error: function (error) {
+            // handle error
+             console.log(error);
+             window.location.href = '../error.html';
+        },
+        async: true,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 60000
+    });
+
+}
+function _(el) {
+  return document.getElementById(el);
+}
+function progressHandler(event) {
+  _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+  var percent = (event.loaded / event.total) * 100;
+  _("progress-bar").value = Math.round(percent);
+  _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+}
+
+function completeHandler(event) {
+  _("status").innerHTML = event.target.responseText;
+  _("progressBar").value = 0; //wil clear progress bar after successful upload
+}
+
+function errorHandler(event) {
+  _("status").innerHTML = "Upload Failed";
+}
+
+function abortHandler(event) {
+  _("status").innerHTML = "Upload Aborted";
+}
+
+</script>
 <script type='text/javascript' src="../js/jquery.js"></script>
 <script type="text/javascript" src="../js/bootstrap.min.js"></script>
- <script type="text/javascript" src="../js/upload.js"></script>
 <script type="text/javascript" src="../js/index.js"></script>
 
 </body>

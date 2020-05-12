@@ -15,7 +15,7 @@ public class TestController
 {
 	@PostMapping("video-upload")
 	public String upload( @RequestParam("file") MultipartFile file){
-		return "success";
+		return "uploadTest.html";
 	}
 	@GetMapping("video-upload")
 	public String uploadGet( Model model ){

@@ -1,40 +1,114 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Test</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--<style>
+            #progress-wrp {
+                border: 1px solid #0099CC;
+                padding: 1px;
+                position: relative;
+                height: 30px;
+                border-radius: 3px;
+                margin: 10px;
+                text-align: left;
+                background: #fff;
+                box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.12);
+                }
+
+            #progress-wrp .progress-bar {
+                height: 100%;
+                border-radius: 3px;
+                background-color: #f39ac7;
+                width: 0;
+                box-shadow: inset 1px 1px 10px rgba(0, 0, 0, 0.11);
+                }
+
+            #progress-wrp .status {
+                top: 3px;
+                left: 50%;
+                position: absolute;
+                display: inline-block;
+                color: #000000;
+                }
+        </style>-->
 </head>
 <body>
-<h2>HTML5 File Upload Progress Bar Tutorial</h2>
-<form id="upload-file-form">
-    <label for="upload-file-input">Upload your file:</label>
-    <input id="upload-file-input" type="file" name="uploadfile" accept="*" />
-    <input type="button" value="upload" onclick="uploadFile()">
+<form method="POST" enctype="multipart/form-data" id="upload_form" onsubmit="uploadFile(); return false;">
+    <input type="file" name="file" id="file"/>
+    <input type="submit" value="Submit">
 </form>
-<!--<script type="text/javascript" src="../js/uploadTest.js"></script>-->
-<script th:inline="javascript">
- /*<![CDATA[*/
-function uploadFile() {
-  $.ajax({
-    url: "/video-upload",
-    type: "POST",
-    data: new FormData($("#upload-file-form")[0]),
-    enctype: 'multipart/form-data',
-    processData: false,
-    contentType: false,
-    cache: false,
-    success: function () {
-      // Handle upload success
-      // ...
-    },
-    error: function () {
-      // Handle upload error
-      // ...
-    }
-  });
+
+<div class="file-path-wrapper">
+    <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+    <h3 id="status"></h3>
+    <p id="loaded_n_total"></p>
+</div>
+
+<div id="progress-wrp">
+    <div class="progress-bar"></div>
+    <div class="status">0%</div>
+</div>
+
+
+<script type="text/javascript">
+            function uploadFile() {
+//  var file = _("file").files[0];
+var file = document.getElementById('file').files[0];
+  var formData = new FormData();
+  formData.append("file", file);
+  console.log(file);
+
+
+      $.ajax({
+        type: "POST",
+        url: "http://localhost:8081/video-upload",
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                myXhr.upload.addEventListener('progress', progressHandler, false);
+            }
+            return myXhr;
+        },
+        success: function (data) {
+            // your callback here
+             console.log("success");
+        },
+        error: function (error) {
+            // handle error
+             console.log(error);
+        },
+        async: true,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 60000
+    });
+
 }
- /*]]>*/
-</script>
+function _(el) {
+  return document.getElementById(el);
+}
+function progressHandler(event) {
+  _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+  var percent = (event.loaded / event.total) * 100;
+  _("progressBar").value = Math.round(percent);
+  _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+}
+
+function completeHandler(event) {
+  _("status").innerHTML = event.target.responseText;
+  _("progressBar").value = 0; //wil clear progress bar after successful upload
+}
+
+function errorHandler(event) {
+  _("status").innerHTML = "Upload Failed";
+}
+
+function abortHandler(event) {
+  _("status").innerHTML = "Upload Aborted";
+}
+        </script>
+<!--<script type="text/javascript" src="../js/upload.js"></script>-->
 </body>
 </html>
